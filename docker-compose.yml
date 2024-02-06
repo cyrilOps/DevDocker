@@ -1,0 +1,31 @@
+version: '3.7'
+services:
+  squash-tm-pg:
+    container_name: squash-tm-pg     
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME}
+    image: postgres:13
+    volumes:
+      - "/var/lib/db-postgresql:/var/lib/postgresql/data" 
+  
+  squash-tm:
+    depends_on:
+      - squash-tm-pg
+    environment:
+      SQTM_DB_TYPE: ${DB_TYPE}
+      SQTM_DB_USERNAME: ${DB_USERNAME}
+      SQTM_DB_PASSWORD: ${DB_PASSWORD}
+      SQTM_DB_NAME: ${DB_DATABASE}
+    ports:
+      - 8080:8080/tcp
+    image: squashtest/squash-tm
+    links:
+      - squash-tm-pg:postgres
+    volumes:
+      - squash-tm-logs:/opt/squash-tm/logs
+      # If you want to activate plugins
+      #- your/path/start-plugins.cfg:/opt/squash-tm/conf/start-plugins.cfg 
+volumes:
+  squash-tm-logs:
